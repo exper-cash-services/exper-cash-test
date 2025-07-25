@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة العمليات المالية - EXPER CASH SERVICES</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* نظام الإشعارات والأخطاء */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .notification {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .notification.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .notification.success::before {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #f8d7da;
+            border: 1px solid #f1b0b7;
+            color: #721c24;
+        }
+
+        .notification.error::before {
+            background: #dc3545;
+        }
+
+        .notification.warning {
+            background: #fff3cd;
+            border: 1px solid #ffe69c;
+            color: #856404;
+        }
+
+        .notification.warning::before {
+            background: #ffc107;
+        }
+
+        .notification.info {
+            background: #cce5ff;
+            border: 1px solid #b3d9ff;
+            color: #004085;
+        }
+
+        .notification.info::before {
+            background: #007bff;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #312884, #4a3799);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            position: relative;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            font-size: 1.9em;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 0.95em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 15px;
+            left: 25px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logout-btn, .admin-panel-btn {
+            background: rgba(220,53,69,0.8);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            margin-left: 5px;
+        }
+
+        .admin-panel-btn {
+            background: rgba(255,193,7,0.8);
+        }
+        
+        .logout-btn:hover {
+            background: rgba(220,53,69,1);
+        }
+
+        .admin-panel-btn:hover {
+            background: rgba(255,193,7,1);
+        }
+        
+        .bilingual-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .ar-text {
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .fr-text {
+            font-style: italic;
+            opacity: 0.85;
+            font-size: 0.9em;
+        }
+        
+        .separator {
+            color: #bdc3c7;
+            margin: 0 5px;
+        }
+
+        /* Login Screen Styles */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .login-header {
+            margin-bottom: 30px;
+        }
+        
+        .login-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            text-align: right;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #312884;
+            box-shadow: 0 0 0 3px rgba(49,40,132,0.1);
+        }
+        
+        .login-btn {
+            padding: 15px;
+            background: linear-gradient(45deg, #312884, #4a3799);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(49,40,132,0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Error Messages */
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f1b0b7;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Main App Styles */
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px 15px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom-color: #312884;
+            color: #312884;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(49,40,132,0.2);
+        }
+        
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+        
+        .tab-content {
+            padding: 35px;
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border: 2px solid #312884;
+        }
+        
+        .page-title h2 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 14px 35px;
+            background: linear-gradient(45deg, #312884, #4a3799);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 12px 8px;
+            box-shadow: 0 3px 10px rgba(49,40,132,0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(49,40,132,0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            box-shadow: 0 3px 10px rgba(23,162,184,0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+            box-shadow: 0 3px 10px rgba(255,193,7,0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            box-shadow: 0 3px 10px rgba(220,53,69,0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                min-width: auto;
+            }
+
+            .user-info {
+                position: static;
+                margin: 10px auto;
+                justify-content: center;
+            }
+
+            .logo {
+                position: static;
+                margin: 0 auto 15px;
+                display: block;
+            }
+
+            .header {
+                text-align: center;
+                padding: 20px 15px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            
+            .container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            .tabs, .user-info, .logout-btn, .admin-panel-btn {
+                display: none !important;
+            }
+            
+            .tab-content {
+                display: block !important;
+                padding: 20px !important;
+            }
+            
+            .tab-content:not(.active) {
+                display: none !important;
+            }
+            
+            .btn, button {
+                display: none !important;
+            }
+            
+            .page-title {
+                page-break-after: avoid;
+                margin-bottom: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .bilingual-text {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Container للإشعارات -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="https://www.adm.co.ma/sites/default/files/inline-images/logo_damanecash_vf_bb1.png" 
+                     alt="Logo" style="width: 80px; margin-bottom: 20px;" onerror="this.style.display='none'">
+                <div class="bilingual-text">
+                    <h2>تسجيل الدخول</h2>
+                    <span class="separator">|</span>
+                    <h2 class="fr-text">Connexion</h2>
+                </div>
+                <div class="bilingual-text" style="color: #666; margin-top: 10px;">
+                    <span>EXPER CASH SERVICES SARL</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">Système de Gestion Financière</span>
+                </div>
+            </div>
+            
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <div class="bilingual-text">
+                        <label>اسم المستخدم</label>
+                        <span class="separator">|</span>
+                        <label class="fr-text">Nom d'utilisateur</label>
+                    </div>
+                    <input type="text" id="username" required placeholder="اسم المستخدم - Username">
+                </div>
+                
+                <div class="form-group">
+                    <div class="bilingual-text">
+                        <label>كلمة المرور</label>
+                        <span class="separator">|</span>
+                        <label class="fr-text">Mot de passe</label>
+                    </div>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <div class="bilingual-text">
+                        <span>🔐 دخول</span>
+                        <span class="separator">|</span>
+                        <span class="fr-text">Se connecter</span>
+                    </div>
+                </button>
+
+                <div id="loginError" class="error-message"></div>
+                <div id="loginSuccess" class="success-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="container" style="display: none;">
+        <div class="header">
+            <div class="user-info">
+                <span id="currentUser">👤 مستخدم</span>
+                <button class="admin-panel-btn" id="adminPanelBtn" onclick="openAdminPanel()" style="display: none;">
+                    <div class="bilingual-text">
+                        <span>⚙️ الإدارة</span>
+                        <span class="separator">|</span>
+                        <span class="fr-text">Admin</span>
+                    </div>
+                </button>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <div class="bilingual-text">
+                        <span>خروج</span>
+                        <span class="separator">|</span>
+                        <span class="fr-text">Déconnexion</span>
+                    </div>
+                </button>
+            </div>
+            
+            <img src="https://www.adm.co.ma/sites/default/files/inline-images/logo_damanecash_vf_bb1.png" 
+                 alt="Logo" class="logo" onerror="this.style.display='none'">
+            <h1>EXPER CASH SERVICES SARL</h1>
+            <div class="subtitle bilingual-text">
+                <span class="ar-text">نظام إدارة العمليات المالية الشامل</span>
+                <span class="separator">|</span>
+                <span class="fr-text">Système de Gestion des Opérations Financières Complet</span>
+            </div>
+            <div class="bilingual-text" style="margin-top: 15px;">
+                <span class="ar-text">المعرف: <span id="displayIdentifier">---</span></span>
+                <span class="separator">|</span>
+                <span class="fr-text">Identifiant: <span id="displayIdentifierFr">---</span></span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard', this)">
+                <div class="bilingual-text">
+                    <span>📊 لوحة التحكم</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">Tableau de Bord</span>
+                </div>
+            </button>
+            <button class="tab" onclick="switchTab('saisie', this)">
+                <div class="bilingual-text">
+                    <span>📝 إدخال يومي</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">Saisie Quotidienne</span>
+                </div>
+            </button>
+            <button class="tab" onclick="switchTab('rapports', this)">
+                <div class="bilingual-text">
+                    <span>📈 التقارير</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">Rapports</span>
+                </div>
+            </button>
+            <button class="tab" onclick="switchTab('historique', this)">
+                <div class="bilingual-text">
+                    <span>📚 السجل التاريخي</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">Historique</span>
+                </div>
+            </button>
+        </div>
+        
+        <!-- لوحة التحكم -->
+        <div id="dashboard" class="tab-content active">
+            <div class="page-title">
+                <div class="bilingual-text">
+                    <h2>لوحة التحكم الرئيسية</h2>
+                    <span class="separator">|</span>
+                    <h2 class="fr-text">Tableau de Bord Principal</h2>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 50px;">
+                <div class="bilingual-text" style="font-size: 24px; margin-bottom: 20px;">
+                    <span>🚀 مرحباً بك في النظام المطور</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">Bienvenue dans le Système Amélioré</span>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <div class="bilingual-text" style="color: #666; font-size: 16px;">
+                        <span>تم تحسين النظام بمعالجة أخطاء متقدمة وإدارة قاعدة البيانات</span>
+                        <span class="separator">|</span>
+                        <span class="fr-text">Système amélioré avec gestion d'erreurs avancée et base de données</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدخال يومي -->
+        <div id="saisie" class="tab-content">
+            <div class="page-title">
+                <div class="bilingual-text">
+                    <h2>الإدخال اليومي للعمليات</h2>
+                    <span class="separator">|</span>
+                    <h2 class="fr-text">Saisie Quotidienne des Opérations</h2>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 50px;">
+                <div class="bilingual-text" style="font-size: 20px; color: #666;">
+                    <span>⚙️ قيد التطوير</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">En cours de développement</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- التقارير -->
+        <div id="rapports" class="tab-content">
+            <div class="page-title">
+                <div class="bilingual-text">
+                    <h2>التقارير والإحصائيات</h2>
+                    <span class="separator">|</span>
+                    <h2 class="fr-text">Rapports et Statistiques</h2>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 50px;">
+                <div class="bilingual-text" style="font-size: 20px; color: #666;">
+                    <span>⚙️ قيد التطوير</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">En cours de développement</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- السجل التاريخي -->
+        <div id="historique" class="tab-content">
+            <div class="page-title">
+                <div class="bilingual-text">
+                    <h2>السجل التاريخي</h2>
+                    <span class="separator">|</span>
+                    <h2 class="fr-text">Historique</h2>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 50px;">
+                <div class="bilingual-text" style="font-size: 20px; color: #666;">
+                    <span>⚙️ قيد التطوير</span>
+                    <span class="separator">|</span>
+                    <span class="fr-text">En cours de développement</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === نظام معالجة الأخطاء المتقدم ===
+        class ErrorHandler {
+            static logError(error, context = '') {
+                const errorInfo = {
+                    message: error.message,
+                    stack: error.stack,
+                    context: context,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
+                
+                console.error('خطأ في النظام:', errorInfo);
+                
+                // إرسال الخطأ لقاعدة البيانات (سيتم تطويره لاحقاً)
+                this.sendErrorToDatabase(errorInfo);
+                
+                return errorInfo;
+            }
+            
+            static sendErrorToDatabase(errorInfo) {
+                // TODO: إرسال الخطأ لقاعدة البيانات
+                // fetch('/api/errors', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(errorInfo)
+                // });
+            }
+            
+            static handleAsyncError(asyncFunction, context = '') {
+                return async (...args) => {
+                    try {
+                        return await asyncFunction(...args);
+                    } catch (error) {
+                        this.logError(error, context);
+                        NotificationSystem.showError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+                        throw error;
+                    }
+                };
+            }
+            
+            static handleSyncError(syncFunction, context = '') {
+                return (...args) => {
+                    try {
+                        return syncFunction(...args);
+                    } catch (error) {
+                        this.logError(error, context);
+                        NotificationSystem.showError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+                        throw error;
+                    }
+                };
+            }
+        }
+
+        // === نظام الإشعارات ===
+        class NotificationSystem {
+            static show(message, type = 'info', duration = 5000) {
+                const container = document.getElementById('notificationContainer');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                
+                const isArabic = /[\u0600-\u06FF]/.test(message);
+                notification.style.direction = isArabic ? 'rtl' : 'ltr';
+                notification.style.textAlign = isArabic ? 'right' : 'left';
+                
+                notification.innerHTML = `
+                    <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+                    <div style="padding-right: 25px;">${message}</div>
+                `;
+                
+                container.appendChild(notification);
+                
+                // إزالة تلقائية
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.style.animation = 'slideOut 0.3s ease-out';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, duration);
+                
+                return notification;
+            }
+            
+            static showSuccess(message) {
+                return this.show(message, 'success');
+            }
+            
+            static showError(message) {
+                return this.show(message, 'error', 8000);
+            }
+            
+            static showWarning(message) {
+                return this.show(message, 'warning');
+            }
+            
+            static showInfo(message) {
+                return this.show(message, 'info');
+            }
+        }
+
+        // === نظام إدارة التحميل ===
+        class LoadingManager {
+            static show() {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            }
+            
+            static hide() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        // === نظام إدارة قاعدة البيانات ===
+        class DatabaseManager {
+            static async makeRequest(endpoint, options = {}) {
+                try {
+                    LoadingManager.show();
+                    
+                    const defaultOptions = {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.getAuthToken()}`
+                        }
+                    };
+                    
+                    const response = await fetch(`/api${endpoint}`, {
+                        ...defaultOptions,
+                        ...options,
+                        headers: { ...defaultOptions.headers, ...options.headers }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    return data;
+                    
+                } catch (error) {
+                    ErrorHandler.logError(error, `Database request to ${endpoint}`);
+                    throw error;
+                } finally {
+                    LoadingManager.hide();
+                }
+            }
+            
+            static getAuthToken() {
+                return sessionStorage.getItem('authToken') || '';
+            }
+            
+            static setAuthToken(token) {
+                sessionStorage.setItem('authToken', token);
+            }
+            
+            static clearAuthToken() {
+                sessionStorage.removeItem('authToken');
+            }
+        }
+
+        // === نظام إدارة المستخدمين ===
+        class UserManager {
+            static currentUser = null;
+            
+            static async login(username, password) {
+                try {
+                    const response = await DatabaseManager.makeRequest('/auth/login', {
+                        method: 'POST',
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    if (response.success) {
+                        this.currentUser = response.user;
+                        DatabaseManager.setAuthToken(response.token);
+                        
+                        // تحديث واجهة المستخدم
+                        this.updateUserInterface();
+                        
+                        NotificationSystem.showSuccess(
+                            `مرحباً ${response.user.name} | Bienvenue ${response.user.name}`
+                        );
+                        
+                        return response;
+                    } else {
+                        throw new Error(response.message || 'فشل تسجيل الدخول');
+                    }
+                } catch (error) {
+                    if (error.message.includes('fetch')) {
+                        // محاكاة تسجيل الدخول للتطوير
+                        return this.simulateLogin(username, password);
+                    }
+                    throw error;
+                }
+            }
+            
+            static simulateLogin(username, password) {
+                // محاكاة للتطوير - سيتم حذفها لاحقاً
+                const users = {
+                    'admin': { password: 'admin123', name: 'المدير', role: 'admin', id: 1 },
+                    'user1': { password: 'user123', name: 'مستخدم 1', role: 'user', id: 2 }
+                };
+                
+                const user = users[username];
+                if (user && user.password === password) {
+                    this.currentUser = {
+                        id: user.id,
+                        username: username,
+                        name: user.name,
+                        role: user.role
+                    };
+                    
+                    DatabaseManager.setAuthToken('simulated_token_' + Date.now());
+                    this.updateUserInterface();
+                    
+                    NotificationSystem.showSuccess(
+                        `مرحباً ${user.name} | Bienvenue ${user.name}`
+                    );
+                    
+                    return { success: true, user: this.currentUser };
+                } else {
+                    throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة');
+                }
+            }
+            
+            static updateUserInterface() {
+                if (!this.currentUser) return;
+                
+                const userDisplay = this.currentUser.role === 'admin' ? 
+                    `👨‍💼 ${this.currentUser.name} (مدير)` : 
+                    `👤 ${this.currentUser.name}`;
+                
+                document.getElementById('currentUser').textContent = userDisplay;
+                
+                // إظهار زر لوحة الإدارة للمدير
+                const adminBtn = document.getElementById('adminPanelBtn');
+                if (this.currentUser.role === 'admin') {
+                    adminBtn.style.display = 'inline-block';
+                } else {
+                    adminBtn.style.display = 'none';
+                }
+                
+                // تحديث معرف الشركة
+                this.updateCompanyIdentifier();
+            }
+            
+            static async updateCompanyIdentifier() {
+                try {
+                    // محاكاة - سيتم جلب المعرف من قاعدة البيانات
+                    const identifier = 'DEMO-5447';
+                    document.getElementById('displayIdentifier').textContent = identifier;
+                    document.getElementById('displayIdentifierFr').textContent = identifier;
+                } catch (error) {
+                    ErrorHandler.logError(error, 'Update company identifier');
+                }
+            }
+            
+            static logout() {
+                this.currentUser = null;
+                DatabaseManager.clearAuthToken();
+                NotificationSystem.showInfo('تم تسجيل الخروج بنجاح | Déconnexion réussie');
+            }
+        }
+
+        // === إدارة التطبيق الرئيسي ===
+        class AppManager {
+            static initialize() {
+                try {
+                    this.setupGlobalErrorHandling();
+                    this.checkAuthStatus();
+                    this.setupEventListeners();
+                    
+                    console.log('✅ تم تهيئة النظام بنجاح - System initialized successfully');
+                } catch (error) {
+                    ErrorHandler.logError(error, 'App initialization');
+                }
+            }
+            
+            static setupGlobalErrorHandling() {
+                // معالجة الأخطاء العامة
+                window.addEventListener('error', (event) => {
+                    ErrorHandler.logError(new Error(event.message), 'Global error');
+                });
+                
+                window.addEventListener('unhandledrejection', (event) => {
+                    ErrorHandler.logError(new Error(event.reason), 'Unhandled promise rejection');
+                    event.preventDefault();
+                });
+            }
+            
+            static checkAuthStatus() {
+                const token = DatabaseManager.getAuthToken();
+                if (token && token.startsWith('simulated_token_')) {
+                    // للتطوير - محاكاة حالة مسجل الدخول
+                    this.showMainApp();
+                } else {
+                    this.showLoginScreen();
+                }
+            }
+            
+            static setupEventListeners() {
+                // إضافة مستمعات الأحداث العامة
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        // إغلاق المودالات أو الإشعارات
+                        const notifications = document.querySelectorAll('.notification');
+                        notifications.forEach(n => n.remove());
+                    }
+                });
+            }
+            
+            static showLoginScreen() {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+            
+            static showMainApp() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                
+                if (UserManager.currentUser) {
+                    UserManager.updateUserInterface();
+                }
+            }
+        }
+
+        // === معالجات الأحداث ===
+        const handleLogin = ErrorHandler.handleAsyncError(async (event) => {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (!username || !password) {
+                NotificationSystem.showWarning('يرجى ملء جميع الحقول | Veuillez remplir tous les champs');
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            
+            try {
+                await UserManager.login(username, password);
+                AppManager.showMainApp();
+                
+                // مسح الحقول
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+            } catch (error) {
+                NotificationSystem.showError(error.message);
+            } finally {
+                loginBtn.disabled = false;
+            }
+        }, 'Login process');
+
+        const handleLogout = ErrorHandler.handleSyncError(() => {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟ | Êtes-vous sûr de vouloir vous déconnecter?')) {
+                UserManager.logout();
+                AppManager.showLoginScreen();
+            }
+        }, 'Logout process');
+
+        const switchTab = ErrorHandler.handleSyncError((tabName, clickedTab) => {
+            // إخفاء جميع المحتويات
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // إخفاء جميع التبويبات
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // إظهار التبويب المحدد
+            document.getElementById(tabName).classList.add('active');
+            clickedTab.classList.add('active');
+        }, 'Tab switching');
+
+        const openAdminPanel = ErrorHandler.handleSyncError(() => {
+            if (UserManager.currentUser?.role !== 'admin') {
+                NotificationSystem.showError('هذه الوظيفة متاحة للمدير فقط | Cette fonction est réservée à l\'administrateur');
+                return;
+            }
+            
+            // فتح صفحة الإدارة في نافذة جديدة
+            window.open('/admin-panel.html', '_blank', 'width=1200,height=800');
+        }, 'Open admin panel');
+
+        // === تهيئة التطبيق ===
+        document.addEventListener('DOMContentLoaded', () => {
+            AppManager.initialize();
+        });
+
+        // إضافة الأنماط للرسوم المتحركة
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
