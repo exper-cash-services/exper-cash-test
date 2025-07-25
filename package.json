@@ -1,14 +1,48 @@
 {
   "name": "exper-cash-services",
   "version": "1.0.0",
-  "main": "app.js",
+  "description": "نظام إدارة العمليات المالية لـ EXPER CASH SERVICES SARL",
+  "main": "server.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "deploy": "railway deploy"
   },
+  "keywords": [
+    "financial-management",
+    "cash-services",
+    "arabic-system",
+    "bilingual",
+    "morocco"
+  ],
+  "author": "EXPER CASH SERVICES SARL",
+  "license": "MIT",
   "dependencies": {
-    "express": "4.18.2"
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "express-rate-limit": "^7.1.5",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   },
   "engines": {
-    "node": "18.x"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/exper-cash-services"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/exper-cash-services/issues"
+  },
+  "homepage": "https://exper-cash-services.railway.app"
 }
