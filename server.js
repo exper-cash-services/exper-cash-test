@@ -769,9 +769,9 @@ async function startServer() {
             if (process.env.NODE_ENV === 'production') {
                 console.log(`
 🌐 Production URLs:
-   Main: https://your-app.railway.app
-   Health: https://your-app.railway.app/api/health
-   Admin: https://your-app.railway.app/admin-panel.html
+   Main: https://exper-cash-test-production.up.railway.app
+   Health: https://exper-cash-test-production.up.railway.app/api/health
+   Admin: https://exper-cash-test-production.up.railway.app/admin-panel.html
                 `);
             }
         });
