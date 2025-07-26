@@ -19,16 +19,17 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5",
+    "cors": "^2.8.5", 
     "helmet": "^7.1.0",
     "compression": "^1.7.4",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
     "dotenv": "^16.3.1",
-    "sqlite3": "^5.1.6",
-    "multer": "^1.4.5-lts.1",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
     "express-rate-limit": "^7.1.5",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
@@ -39,10 +40,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/exper-cash-services"
+    "url": "https://github.com/exper-cash-services/exper-cash-test"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/exper-cash-services/issues"
+    "url": "https://github.com/exper-cash-services/exper-cash-test/issues"
   },
-  "homepage": "https://exper-cash-services.railway.app"
+  "homepage": "https://exper-cash-test-production.up.railway.app"
 }
